@@ -4,6 +4,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import time
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 # User details
 CALENDLY_URL = "https://calendly.com/matejotys/30minutes"
@@ -15,7 +17,14 @@ DATE = "24"  # Date to select
 TIME = "15:30"  # Time to select
 
 # Start WebDriver
-driver = webdriver.Chrome()  # Ensure ChromeDriver is installed
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")  # Run in headless mode
+options.add_argument("--no-sandbox")  # Required for Heroku
+options.add_argument("--disable-dev-shm-usage")  # Fixes memory issues
+options.add_argument("--user-data-dir=/tmp/user-data")  # Avoids user data conflict
+options.add_argument("--remote-debugging-port=9222")  # Allows debugging
+
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 driver.get(CALENDLY_URL)
 wait = WebDriverWait(driver, 10)
 
