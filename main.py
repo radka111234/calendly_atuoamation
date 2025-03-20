@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 import subprocess
+import os
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
@@ -32,9 +33,12 @@ chrome_version = subprocess.run(
     capture_output=True, text=True
 ).stdout.strip().split(" ")[2]  # Extract version number
 
-# ✅ Install the matching ChromeDriver version
+# ✅ Install the matching ChromeDriver version using os.system()
+os.system(f"pip install webdriver-manager && webdriver-manager chrome --version {chrome_version}")
+
+# ✅ Initialize Chrome with matching ChromeDriver
 driver = webdriver.Chrome(
-    service=Service(ChromeDriverManager(version=chrome_version).install()),
+    service=Service(ChromeDriverManager().install()),
     options=options
 )
 driver.get(CALENDLY_URL)
