@@ -33,12 +33,13 @@ chrome_version = subprocess.run(
     capture_output=True, text=True
 ).stdout.strip().split(" ")[2]  # Extract version number
 
-# ✅ Install the matching ChromeDriver version using os.system()
-os.system(f"pip install webdriver-manager && webdriver-manager chrome --version {chrome_version}")
+# ✅ Download the correct ChromeDriver version
+chromedriver_path = f"/app/.chromedriver/{chrome_version}"
+os.system(f"wget -q -O {chromedriver_path} https://storage.googleapis.com/chrome-for-testing-public/{chrome_version}/linux64/chromedriver-linux64.zip && unzip {chromedriver_path} -d /app/.chromedriver/")
 
-# ✅ Initialize Chrome with matching ChromeDriver
+# ✅ Initialize Chrome with the manually installed ChromeDriver
 driver = webdriver.Chrome(
-    service=Service(ChromeDriverManager().install()),
+    service=Service("/app/.chromedriver/chromedriver-linux64/chromedriver"),
     options=options
 )
 driver.get(CALENDLY_URL)
