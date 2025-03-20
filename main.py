@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
+import subprocess
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
@@ -23,15 +24,17 @@ options = webdriver.ChromeOptions()
 options.add_argument("--headless")  # Run in headless mode
 options.add_argument("--no-sandbox")  # Required for Heroku
 options.add_argument("--disable-dev-shm-usage")  # Prevents memory issues
-options.add_argument("--user-data-dir=/tmp/user-data")  # Avoids user data conflict
-options.add_argument("--remote-debugging-port=9222")  # Allows debugging
+options.binary_location = "/app/.chrome-for-testing/chrome-linux64/chrome"  # Heroku's Chrome path
 
-# ✅ Manually set the correct Chrome binary path
-options.binary_location = "/app/.chrome-for-testing/chrome-linux64/chrome"
+# ✅ Detect the correct Chrome version installed on Heroku
+chrome_version = subprocess.run(
+    ["/app/.chrome-for-testing/chrome-linux64/chrome", "--version"],
+    capture_output=True, text=True
+).stdout.strip().split(" ")[2]  # Extract version number
 
-# ✅ Match ChromeDriver to the installed Chrome version
+# ✅ Install the matching ChromeDriver version
 driver = webdriver.Chrome(
-    service=Service(ChromeDriverManager(path="/app/.chromedriver").install()),
+    service=Service(ChromeDriverManager(version=chrome_version).install()),
     options=options
 )
 driver.get(CALENDLY_URL)
