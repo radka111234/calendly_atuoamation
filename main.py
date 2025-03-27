@@ -3,10 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
-import subprocess
-import os
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 import time
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -17,31 +14,21 @@ USER_NAME = "Radka Test"
 USER_EMAIL = "radarudova@gmail.com"
 UK_TIMEZONE = "UK"  # Adjust if needed
 MEETING_TYPE = "Google Meet"
-DATE = "24"  # Date to select
-TIME = "15:30"  # Time to select
+DATE = "31"  # Date to select
+TIME = "15:00"  # Time to select
 
-# Start WebDriver
-options = webdriver.ChromeOptions()
-options.add_argument("--headless")  # Run in headless mode
-options.add_argument("--no-sandbox")  # Required for Heroku
-options.add_argument("--disable-dev-shm-usage")  # Prevents memory issues
-options.binary_location = "/app/.chrome-for-testing/chrome-linux64/chrome"  # Heroku's Chrome path
 
-# ✅ Detect the correct Chrome version installed on Heroku
-chrome_version = subprocess.run(
-    ["/app/.chrome-for-testing/chrome-linux64/chrome", "--version"],
-    capture_output=True, text=True
-).stdout.strip().split(" ")[2]  # Extract version number
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
 
-# ✅ Download the correct ChromeDriver version
-chromedriver_path = f"/app/.chromedriver/{chrome_version}"
-os.system(f"wget -q -O {chromedriver_path} https://storage.googleapis.com/chrome-for-testing-public/{chrome_version}/linux64/chromedriver-linux64.zip && unzip {chromedriver_path} -d /app/.chromedriver/")
+# Initialize the WebDriver with the correct path to Chrome
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
-# ✅ Initialize Chrome with the manually installed ChromeDriver
-driver = webdriver.Chrome(
-    service=Service("/app/.chromedriver/chromedriver-linux64/chromedriver"),
-    options=options
-)
+
+
+
 driver.get(CALENDLY_URL)
 wait = WebDriverWait(driver, 10)
 
